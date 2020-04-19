@@ -1,33 +1,20 @@
 import React, {Component} from 'react';
 import './App.css';
-import LoginScreen from './loginScreen';
+import Login from './login';
+import Dashboard from './dashboard';
+import Register from './register';
+import { BrowserRouter, Switch, Route} from 'react-router-dom';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loginPage: [],
-      uploadScreen: []
-    }
-  }
-
-  componentWillMount() {
-    var loginPage = [];
-    loginPage.push(<LoginScreen parentContext={this} key={'login-screen'}/>);
-    this.setState({
-      loginPage: loginPage
-    });
-  }
-
-  render() {
-    return (
-      <div className = 'App'>
-        {this.state.loginPage}
-        {this.state.uploadScreen}
-      </div>
-    )
-  }
+function App() {
+  return(
+    <BrowserRouter>
+   <Switch>
+     <Route path='/login' component={Login}/>
+     <Route path='/register' component={Register}/>
+     <Route path='/' component={Dashboard}/>
+   </Switch>
+   </BrowserRouter>
+)
 }
-
 
 export default App;

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -16,57 +16,59 @@ class Login extends Component {
             password: '',
         }
     }
-   render() {
-       return (
-           <MuiThemeProvider>
-               <div>
-               <AppBar position="static" color='transparent' style={{backgroundColor: 'rgb(0, 188, 212', alignItems: 'center'}}>
+    render() {
+        return (
+            <MuiThemeProvider>
+                <div>
+                    <AppBar position="static" color='transparent' style={{ backgroundColor: 'rgb(0, 188, 212', alignItems: 'center' }}>
                         <Toolbar>
-        
-                            <Typography variant="h6" style={{color: 'white', textAlign: 'center'}}>
+
+                            <Typography variant="h6" style={{ color: 'white', textAlign: 'center' }}>
                                 Login
                            </Typography>
                         </Toolbar>
                     </AppBar>
-                   <TextField hintText = "Enter your username" floatingLabelText = "username"
-                   onChange = {(event, newValue) => this.setState({username: newValue})}></TextField>
-                   <br/>
+                    <div style={{textAlign: 'center'}}>
+                    <TextField hintText="Enter your username" floatingLabelText="username"
+                        onChange={(event, newValue) => this.setState({ username: newValue })}></TextField>
+                    <br />
 
-                   <TextField type = "password" hintText = "Enter your Password" floatingLabelText = "password"
-                   onChange = {(event, newValue) => this.setState({password: newValue})}></TextField>
-                   <br/>
+                    <TextField type="password" hintText="Enter your Password" floatingLabelText="password"
+                        onChange={(event, newValue) => this.setState({ password: newValue })}></TextField>
+                    <br />
 
-                   <RaisedButton label = "Submit" primary = {true} style = {loginStyle}
-                   onClick = {(event) => this.submitLogin(event)}/>                 
-               </div>
-           </MuiThemeProvider>
-       )
-   } 
-
-   submitLogin(event) {
-    var self = this;
-    var payload = {
-        "username": this.state.username,
-        "password": this.state.password,
+                    <RaisedButton label="Submit" primary={true} style={loginStyle}
+                        onClick={(event) => this.submitLogin(event)} />
+                </div>
+                </div>
+            </MuiThemeProvider>
+        )
     }
-    axios.post(apiBaseUrl+'login', payload).then(function (response) {
-        console.log(response);
-       if (response.data.code === 200) {
-        console.log('Login successful');
-        // var uploadScreen = [];
-        // uploadScreen.push(<UploadScreen appContext = {self.props.appContext}/>)
-        // self.props.appContext.setState({loginPage: [], uploadScreen: uploadScreen})
-       }
-       else if (response.data.code === 204) {
-         console.log('user name or password don`t match') 
-       }
-       else {
-        console.log('username doesn`t exist');
-       }  
-    }).catch(function (error) {
-       console.log(error);
-    })
-   }
+
+    submitLogin(event) {
+        var self = this;
+        var payload = {
+            "username": this.state.username,
+            "password": this.state.password,
+        }
+        axios.post(apiBaseUrl + 'login', payload).then(function (response) {
+            console.log(response);
+            if (response.data.code === 200) {
+                console.log('Login successful');
+                // var uploadScreen = [];
+                // uploadScreen.push(<UploadScreen appContext = {self.props.appContext}/>)
+                // self.props.appContext.setState({loginPage: [], uploadScreen: uploadScreen})
+            }
+            else if (response.data.code === 204) {
+                console.log('user name or password don`t match')
+            }
+            else {
+                console.log('username doesn`t exist');
+            }
+        }).catch(function (error) {
+            console.log(error);
+        })
+    }
 }
 
 

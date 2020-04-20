@@ -15,6 +15,7 @@ class Login extends Component {
             username: '',
             password: '',
         }
+        this.goToRegistration = this.goToRegistration.bind(this);
     }
     render() {
         return (
@@ -28,21 +29,36 @@ class Login extends Component {
                            </Typography>
                         </Toolbar>
                     </AppBar>
-                    <div style={{textAlign: 'center'}}>
-                    <TextField hintText="Enter your username" floatingLabelText="username"
-                        onChange={(event, newValue) => this.setState({ username: newValue })}></TextField>
-                    <br />
+                    <div style={{ textAlign: 'center' }}>
+                        <TextField hintText="Enter your username" floatingLabelText="username"
+                            onChange={(event, newValue) => this.setState({ username: newValue })}></TextField>
+                        <br />
 
-                    <TextField type="password" hintText="Enter your Password" floatingLabelText="password"
-                        onChange={(event, newValue) => this.setState({ password: newValue })}></TextField>
-                    <br />
+                        <TextField type="password" hintText="Enter your Password" floatingLabelText="password"
+                            onChange={(event, newValue) => this.setState({ password: newValue })}></TextField>
+                        <br />
 
-                    <RaisedButton label="Submit" primary={true} style={loginStyle}
-                        onClick={(event) => this.submitLogin(event)} />
+                        <RaisedButton label="Submit" primary={true} style={loginStyle}
+                            onClick={(event) => this.submitLogin(event)} />
+
+                        <br />
+
+
+                        <br />
+                        <p>Don't have an account?</p>
+                        <RaisedButton label="Register" primary={true} style={loginStyle}
+                            onClick={this.goToRegistration} />
+                    </div>
+
                 </div>
-                </div>
+
             </MuiThemeProvider>
         )
+    }
+
+    goToRegistration() {
+        const { history } = this.props;
+        history.push('/register');
     }
 
     submitLogin(event) {

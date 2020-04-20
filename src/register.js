@@ -15,7 +15,7 @@ class Register extends React.Component {
 
     constructor(props) {
         super(props);
-        this.register = this.register.bind(this);
+      
         this.state = {
             first_name: '',
             last_name: '',
@@ -25,6 +25,8 @@ class Register extends React.Component {
             error: false,
             errorMessage: '',
         }
+        this.register = this.register.bind(this);
+        this.goToLogin = this.goToLogin.bind(this);
        
     }
     // componentWillReceiveProps(nextPops) {
@@ -61,6 +63,11 @@ class Register extends React.Component {
             this.setState({ errorMessage: 'some fiels are missing!' });
         }
         
+    }
+
+    goToLogin() {
+        const { history } = this.props;
+        history.push('/login');
     }
 
     closeError() {
@@ -108,6 +115,11 @@ class Register extends React.Component {
 
            
                        {this.state.error ? <Alert onClose={() => { this.closeError() }} severity="error">{this.state.errorMessage}</Alert> : null}
+
+                       <br />
+                       <p>Already a user?</p>
+                       <RaisedButton label="Login" primary={true} style={loginStyle}
+                            onClick={this.goToLogin} />
                     </div>
                 </div>
             </MuiThemeProvider>

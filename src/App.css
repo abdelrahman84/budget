@@ -2,9 +2,51 @@
   text-align: center;
 }
 
+.menuItem {
+  color: white !important;
+}
+
+.menuGrid {
+  display: flex;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.formItem {
+  text-align: center;
+}
+
+.loginStyle {
+  margin:15;
+}
+
+.budgetForm {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 401px) {
+
+  .menuGrid {
+    margin: auto;
+    align-items: center;
+  }
+
+  .btnDrawer {
+    position: fixed;
+    left: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .menuGrid {
+    display: flex;
+    align-items: center;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

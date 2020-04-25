@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './App.css';
 import Login from './login';
 import Dashboard from './dashboard';
 import Register from './register';
 import { BrowserRouter, Switch, Route} from 'react-router-dom';
+import './App.css';
 
 function App() {
   return(

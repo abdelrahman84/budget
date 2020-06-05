@@ -19,6 +19,10 @@
   text-align: center;
 }
 
+.form {
+  padding: 1rem;
+}
+
 .loginStyle {
   margin:15;
 }
@@ -26,6 +30,11 @@
 .budgetForm {
   display: flex;
   flex-direction: column;
+  margin-top: 3rem;
+}
+
+.addBudget {
+  text-align: center;
 }
 
 @media (min-width: 401px) {

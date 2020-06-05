@@ -14,6 +14,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
+import Alert from '@material-ui/lab/Alert';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 var apiBaseUrl = 'http://localhost:3000/';
 
 
@@ -25,7 +28,11 @@ class Dashboard extends Component {
             user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : '',
             token: localStorage.getItem('token') ? localStorage.getItem('token') : '',
             title: '',
-            cycle: '',
+            cycle: 1,
+            error: false,
+            errorMessage: '',
+            success: false,
+            newBudgetRequested: false,
 
         };
         if (!this.state.user && !this.state.token) {
@@ -33,12 +40,11 @@ class Dashboard extends Component {
         }
 
         this.logout = this.logout.bind(this);
-        this.CycleRange = Array.from(Array(31).keys()).map(i => 0+i+1);
+        this.CycleRange = Array.from(Array(31).keys()).map(i => 0 + i + 1);
     }
 
     componentWillMount() {
         this.getUserBudget();
-        // console.log(this.CycleRange)
     }
 
     logout() {
@@ -65,12 +71,49 @@ class Dashboard extends Component {
     }
 
 
-
     createBudget() {
-        //console.log(this.state.title);
-        //console.log(this.state.cycle.props.value);
+
+        if (this.state.title.length > 0 && this.state.cycle) {
+            const payload = {
+                'title': this.state.title,
+                'cycle': this.state.cycle,
+                'user': this.state.user._id,
+
+            }
+            const axiosHeader = {
+                headers: {
+                    'x-access-token': this.state.token
+                }
+            }
+            axios.post(apiBaseUrl + 'api/budget', payload, axiosHeader).then(response => {
+                if (response.data.status === 'success') {
+                    this.setState({ error: false });
+                    this.setState({ success: true });
+                }
+                else {
+                    this.setState({ error: true });
+                    this.setState({ errorMessage: Array.isArray(response.data.message) ? response.data.message[0]['msg'] : response.data.message })
+                }
+            }).catch(function (error) {
+                console.log(error);
+            })
+        } else {
+            this.setState({ error: true });
+            this.setState({ errorMessage: 'please complete all fields!' });
+        }
     }
 
+    closeMessage(message) {
+        if (message == 'error') {
+            this.setState({ error: false });
+        } else {
+            this.setState({ success: false });
+        }
+    }
+
+    hangleBudgetCycle = event => {
+        this.setState({ cycle: event.target.value });
+      };
 
     render() {
         return (
@@ -99,43 +142,52 @@ class Dashboard extends Component {
                         </Toolbar>
                     </AppBar>
 
+
                     <div className="budgetForm">
 
-                        <div className="formItem">
-
-                            <TextField hintText="Enter budjet title" floatingLabelText="title"
-                                onChange={(event, newValue) => this.setState({ title: newValue })}></TextField>
-
+                        <div className="addBudget">
+                            <Fab color="primary" aria-label="add">
+                                <AddIcon />
+                            </Fab>
                         </div>
 
-                          <div className="formItem">
-                                <InputLabel id="cycle">Cycle</InputLabel>
-                                <Select
-                                    labelId="cycle"
-                                    id="cyle"
-                                    value={this.state.cycle}
-                                    onChange={(event, newValue) => this.setState({ cycle: newValue })}
-                                >
-                                   
-                                    {
-                                       this.CycleRange.map(el => <MenuItem value ={el} key={el}> {el} </MenuItem>) 
-                                    }
-                                    
-                                </Select>
-                            </div>
+                        <div style={{ textAlign: 'center' }}>
+                        <TextField hintText="title" floatingLabelText="title"
+                            onChange={(event, newValue) => this.setState({ title: newValue })}></TextField>
+                        <br />
+
+
+                        <FormControl className="form">
+                            <InputLabel id="cycle">Cycle</InputLabel>
+                            <Select
+                                labelId="cycle"
+                                id="cyle"
+                                value={this.state.cycle}
+                                // onChange={(event, newValue) => this.setState({ cycle: newValue })}
+                                onChange={this.hangleBudgetCycle}
+
+                            >
+                                {
+                                    this.CycleRange.map(el => <MenuItem value={el} key={el}> {el} </MenuItem>)
+                                }
+
+                            </Select>
+
+                        </FormControl>
+                         </div>
+
                         <br />
 
                         <RaisedButton label="Submit" primary={true} className="loginStyle"
                             onClick={(event) => this.createBudget(event)} />
 
-
-
-
-
                     </div>
 
+                    <br />
 
+                    {this.state.error ? <Alert onClose={() => { this.closeMessage('error') }} severity="error">{this.state.errorMessage}</Alert> : null}
 
+                    {this.state.success ? <Alert onClose={() => { this.closeMessage('success') }} severity="success">Budget created successfully</Alert> : null}
                 </div>
             </MuiThemeProvider>
         )

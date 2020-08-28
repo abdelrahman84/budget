@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -19,181 +19,182 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 var apiBaseUrl = 'http://localhost:3000/';
 
+const Dashboard = (props) => {
 
+  const [user, setUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : '');
+  const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
+  const [title, setTitle] = useState('');
+  const [cycle, setCycle] = useState(1);
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [newBudgetRequested, setNewBudgetRequested] = useState(false);
 
-class Dashboard extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : '',
-            token: localStorage.getItem('token') ? localStorage.getItem('token') : '',
-            title: '',
-            cycle: 1,
-            error: false,
-            errorMessage: '',
-            success: false,
-            newBudgetRequested: false,
+  useEffect(() => {
 
-        };
-        if (!this.state.user && !this.state.token) {
-            this.props.history.push('/login');
-        }
-
-        this.logout = this.logout.bind(this);
-        this.CycleRange = Array.from(Array(31).keys()).map(i => 0 + i + 1);
+    if (!user && !token) {
+      props.history.push('/login');
     }
 
-    componentWillMount() {
-        this.getUserBudget();
-    }
+    getUserBudget();
 
-    logout() {
-        const { history } = this.props;
+  })
+
+
+  const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        history.push('/login');
-    }
-
-    getUserBudget() {
-        const payload = {
-            'params': {
-                'user_id': this.state.user._id
-            }
-        }
-        const axiosHeader = {
-            headers: {
-                'x-access-token': this.state.token
-            }
-        }
-        axios.get(apiBaseUrl + 'api/user_budget', Object.assign(payload, axiosHeader)).then(response => {
-            //console.log(response.data);
-        })
+        props.history.push('/login');
     }
 
 
-    createBudget() {
 
-        if (this.state.title.length > 0 && this.state.cycle) {
-            const payload = {
-                'title': this.state.title,
-                'cycle': this.state.cycle,
-                'user': this.state.user._id,
-
-            }
-            const axiosHeader = {
-                headers: {
-                    'x-access-token': this.state.token
-                }
-            }
-            axios.post(apiBaseUrl + 'api/budget', payload, axiosHeader).then(response => {
-                if (response.data.status === 'success') {
-                    this.setState({ error: false });
-                    this.setState({ success: true });
-                }
-                else {
-                    this.setState({ error: true });
-                    this.setState({ errorMessage: Array.isArray(response.data.message) ? response.data.message[0]['msg'] : response.data.message })
-                }
-            }).catch(function (error) {
-                console.log(error);
-            })
-        } else {
-            this.setState({ error: true });
-            this.setState({ errorMessage: 'please complete all fields!' });
-        }
-    }
-
-    closeMessage(message) {
+const closeMessage = (message) => {
         if (message == 'error') {
-            this.setState({ error: false });
+            setError(false);
         } else {
-            this.setState({ success: false });
+            setSuccess(false);
         }
     }
 
-    hangleBudgetCycle = event => {
-        this.setState({ cycle: event.target.value });
-      };
 
-    render() {
-        return (
-            <MuiThemeProvider>
-                <div>
-                    <AppBar position="static" color='transparent' style={{ backgroundColor: 'rgb(0, 188, 212' }}>
-                        <Toolbar>
-                            <div className="menuGrid">
+  const getUserBudget = () => {
+    const payload = {
+      'params': {
+        'user_id': user._id
+      }
+    }
+    const axiosHeader = {
+      headers: {
+        'x-access-token': token
+      }
+    }
+    axios.get(apiBaseUrl + 'api/user_budget', Object.assign(payload, axiosHeader)).then(response => {
+      console.log(response.data);
+    })
+  }
 
-                                <div className="btnDrawer">
-                                    <IconButton edge="start" color="inherit" aria-label="menu" className="menuItem">
-                                        <MenuIcon />
-                                    </IconButton>
-                                </div>
+  const hangleBudgetCycle = event => {
+    setCycle(event.target.value);
+  };
+
+  const CycleRange = Array.from(Array(31).keys()).map(i => 0 + i + 1);
 
 
-                                <Typography variant="h6" className="menuItem">
-                                    Welcome {this.state.user.first_name}
-                                </Typography>
+  const createBudget = () => {
+
+    if (title.length > 0 && cycle) {
+      const payload = {
+        'title': title,
+        'cycle': cycle,
+        'user': user._id,
+
+      }
+      const axiosHeader = {
+        headers: {
+          'x-access-token': token
+        }
+      }
+      axios.post(apiBaseUrl + 'api/budget', payload, axiosHeader).then(response => {
+        if (response.data.status === 'success') {
+          setError(false);
+          setSuccess(true);
+        }
+        else {
+          setError(true);
+          setErrorMessage(Array.isArray(response.data.message) ? response.data.message[0]['msg'] : response.data.message)
+        }
+      }).catch(function (error) {
+        console.log(error);
+      })
+    } else {
+      setError(true);
+      setErrorMessage('please complete all fields!');
+    }
+  }
 
 
-                                {/* <Grid item>
+
+  return (
+    <MuiThemeProvider>
+      <div>
+        <AppBar position="static" color='transparent' style={{ backgroundColor: 'rgb(0, 188, 212' }}>
+          <Toolbar>
+            <div className="menuGrid">
+
+              <div className="btnDrawer">
+                <IconButton edge="start" color="inherit" aria-label="menu" className="menuItem">
+                  <MenuIcon />
+                </IconButton>
+              </div>
+
+
+              <Typography variant="h6" className="menuItem">
+                Welcome {user.first_name}
+              </Typography>
+
+
+              {/* <Grid item>
                                     <Button style={{ color: 'white' }} onClick={this.logout}>Logout</Button>
                                 </Grid> */}
-                            </div>
-                        </Toolbar>
-                    </AppBar>
+            </div>
+          </Toolbar>
+        </AppBar>
 
 
-                    <div className="budgetForm">
+        <div className="budgetForm">
 
-                        <div className="addBudget">
-                            <Fab color="primary" aria-label="add">
-                                <AddIcon />
-                            </Fab>
-                        </div>
+          <div className="addBudget">
+            <Fab color="primary" aria-label="add">
+              <AddIcon />
+            </Fab>
+          </div>
 
-                        <div style={{ textAlign: 'center' }}>
-                        <TextField hintText="title" floatingLabelText="title"
-                            onChange={(event, newValue) => this.setState({ title: newValue })}></TextField>
-                        <br />
+          <div style={{ textAlign: 'center' }}>
+            <TextField hintText="title" floatingLabelText="title"
+              onChange={(event, newValue) => setTitle(newValue)}></TextField>
+            <br />
 
 
-                        <FormControl className="form">
-                            <InputLabel id="cycle">Cycle</InputLabel>
-                            <Select
-                                labelId="cycle"
-                                id="cyle"
-                                value={this.state.cycle}
-                                // onChange={(event, newValue) => this.setState({ cycle: newValue })}
-                                onChange={this.hangleBudgetCycle}
+            <FormControl className="form">
+              <InputLabel id="cycle">Cycle</InputLabel>
+              <Select
+                labelId="cycle"
+                id="cyle"
+                value={cycle}
+                // onChange={(event, newValue) => this.setState({ cycle: newValue })}
+                onChange={hangleBudgetCycle}
 
-                            >
-                                {
-                                    this.CycleRange.map(el => <MenuItem value={el} key={el}> {el} </MenuItem>)
-                                }
+              >
+                {
+                  CycleRange.map(el => <MenuItem value={el} key={el}> {el} </MenuItem>)
+                }
 
-                            </Select>
+              </Select>
 
-                        </FormControl>
-                         </div>
+            </FormControl>
+          </div>
 
-                        <br />
+          <br />
 
-                        <RaisedButton label="Submit" primary={true} className="loginStyle"
-                            onClick={(event) => this.createBudget(event)} />
+          <RaisedButton label="Submit" primary={true} className="loginStyle"
+            onClick={(event) => createBudget(event)} />
 
-                    </div>
+        </div>
 
-                    <br />
+        <br />
 
-                    {this.state.error ? <Alert onClose={() => { this.closeMessage('error') }} severity="error">{this.state.errorMessage}</Alert> : null}
+        {error ? <Alert onClose={() => { closeMessage('error') }} severity="error">{errorMessage}</Alert> : null}
 
-                    {this.state.success ? <Alert onClose={() => { this.closeMessage('success') }} severity="success">Budget created successfully</Alert> : null}
-                </div>
-            </MuiThemeProvider>
-        )
-    }
+        {success ? <Alert onClose={() => { closeMessage('success') }} severity="success">Budget created successfully</Alert> : null}
+      </div>
+    </MuiThemeProvider>
+
+  )
+
 
 }
+
 
 
 export default Dashboard;

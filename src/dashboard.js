@@ -1,10 +1,8 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import axios from 'axios';
@@ -17,10 +15,28 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Alert from '@material-ui/lab/Alert';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import { Drawer } from '@material-ui/core';
+import clsx from 'clsx';
+import { makeStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import LogoutIcon from '@material-ui/icons/ExitToApp';
+import ListItemText from '@material-ui/core/ListItemText';
 var apiBaseUrl = 'http://localhost:3000/';
+
+const useStyles = makeStyles({
+  list: {
+    width: 250,
+  },
+  fullList: {
+    width: 'auto',
+  },
+});
 
 const Dashboard = (props) => {
 
+  const classes = useStyles();
   const [user, setUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : '');
   const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
   const [title, setTitle] = useState('');
@@ -29,6 +45,12 @@ const Dashboard = (props) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [newBudgetRequested, setNewBudgetRequested] = useState(false);
+  const [drawer, setDrawer] = useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false
+  })
 
   useEffect(() => {
 
@@ -113,6 +135,32 @@ const closeMessage = (message) => {
     }
   }
 
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setDrawer({ ...drawer , [anchor]: open})
+  }
+
+  const list = (anchor) => (
+    <div
+      className={clsx(classes.list, {
+        [classes.fullList]: anchor === 'top' || anchor === 'bottom',
+      })}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <List>
+          <ListItem onClick={logout}>
+            <ListItemIcon><LogoutIcon /></ListItemIcon>
+            <ListItemText primary="Logout"></ListItemText>
+          </ListItem>
+      </List>
+    </div>
+  );
+
+
 
 
   return (
@@ -123,7 +171,7 @@ const closeMessage = (message) => {
             <div className="menuGrid">
 
               <div className="btnDrawer">
-                <IconButton edge="start" color="inherit" aria-label="menu" className="menuItem">
+                <IconButton edge="start" color="inherit" aria-label="menu" className="menuItem" onClick={toggleDrawer('right', true)}>
                   <MenuIcon />
                 </IconButton>
               </div>
@@ -140,6 +188,10 @@ const closeMessage = (message) => {
             </div>
           </Toolbar>
         </AppBar>
+
+        <Drawer open={drawer['right']} onClose={toggleDrawer('right', false)}>
+          {list('right')}
+        </Drawer>
 
 
         <div className="budgetForm">

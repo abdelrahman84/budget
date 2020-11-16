@@ -23,6 +23,9 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import LogoutIcon from '@material-ui/icons/ExitToApp';
 import ListItemText from '@material-ui/core/ListItemText';
+import { addBudget } from './store/actions/index';
+import {useDispatch, useSelector} from 'react-redux';
+import Budget from './components/budjet';
 var apiBaseUrl = 'http://localhost:3000/';
 
 const useStyles = makeStyles({
@@ -52,6 +55,8 @@ const Dashboard = (props) => {
     right: false
   })
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
 
     if (!user && !token) {
@@ -60,7 +65,7 @@ const Dashboard = (props) => {
 
     getUserBudget();
 
-  })
+  }, [])
 
 
   const logout = () => {
@@ -92,7 +97,11 @@ const closeMessage = (message) => {
       }
     }
     axios.get(apiBaseUrl + 'api/user_budget', Object.assign(payload, axiosHeader)).then(response => {
-      console.log(response.data);
+      if (response.data.result?.length) {
+        setNewBudgetRequested(true);
+        dispatch(addBudget(response.data.result[0]))
+
+      }
     })
   }
 
@@ -121,6 +130,8 @@ const closeMessage = (message) => {
         if (response.data.status === 'success') {
           setError(false);
           setSuccess(true);
+          dispatch(addBudget(response.data.budget))
+          setNewBudgetRequested(true);
         }
         else {
           setError(true);
@@ -194,7 +205,7 @@ const closeMessage = (message) => {
         </Drawer>
 
 
-        <div className="budgetForm">
+        {!newBudgetRequested ? <div className="budgetForm">
 
           <div className="addBudget">
             <Fab color="primary" aria-label="add">
@@ -232,7 +243,7 @@ const closeMessage = (message) => {
           <RaisedButton label="Submit" primary={true} className="loginStyle"
             onClick={(event) => createBudget(event)} />
 
-        </div>
+        </div> : <Budget/>}
 
         <br />
 

@@ -19,8 +19,10 @@ class Login extends Component {
             errorMessage: '',
         }
         this.goToRegistration = this.goToRegistration.bind(this);
+        this.onKeyPress = this.onKeyPress.bind(this);
         this.submitLogin = this.submitLogin.bind(this);
     }
+ 
     render() {
         return (
             <MuiThemeProvider>
@@ -39,11 +41,11 @@ class Login extends Component {
                         <br />
 
                         <TextField type="password" hintText="Enter your Password" floatingLabelText="password"
-                            onChange={(event, newValue) => this.setState({ password: newValue })}></TextField>
+                            onChange={(event, newValue) => this.setState({ password: newValue })} onKeyPress={this.onKeyPress}></TextField>
                         <br />
 
                         <RaisedButton label="Submit" primary={true} style={loginStyle}
-                            onClick={(event) => this.submitLogin(event)} />
+                            onClick={(event) => this.submitLogin()} />
 
                         {this.state.error ? <Alert onClose={() => { this.closeError() }} severity="error">{this.state.errorMessage}</Alert> : null}
 
@@ -62,6 +64,12 @@ class Login extends Component {
         )
     }
 
+    onKeyPress(target) {
+        if (target.charCode == 13) {
+            this.submitLogin();
+        }
+     }
+
     goToRegistration() {
         const { history } = this.props;
         history.push('/register');
@@ -71,7 +79,7 @@ class Login extends Component {
         this.setState({ error: false });
     }
 
-    submitLogin(event) {
+    submitLogin() {
         const { history } = this.props;
         if (this.state.email.length > 0 && this.state.password.length > 0) {
             var payload = {
